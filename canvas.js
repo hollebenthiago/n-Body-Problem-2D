@@ -4,8 +4,15 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 var c = canvas.getContext('2d');
-
+var numberballs = window.prompt('quantas bolas vc quer?');
+var mousenotPressed = false;
+var counter = 0;
 var mouse = {
+    x: undefined,
+    y: undefined
+}
+
+var mouseclick = {
     x: undefined,
     y: undefined
 }
@@ -15,7 +22,36 @@ function(event) {
     mouse.x = event.x;
     mouse.y = event.y;
 })
+
+window.addEventListener("mousedown", function(e){
+    mousePressed = true;
+    counter += 1;
+    window.onmousemove = function(e) {
+        if(mousePressed == true){
+            mouseclick.x = mouse.x;
+            mouseclick.y = mouse.y;
+        }
+     }
+});
+//window.addEventListener('mousedown', function() {
+//   console.log('bbbbb');   
+//    mouseclick.x =  event.x;
+//    mouseclick.y = event.y;
+//    counter +=1;
+
+//})
+
+window.addEventListener('mouseup',function() {
+    //console.log('ccccccccc');
+    mousePressed = false;
+    counter += 1;
+})
+if (counter%2 == 1) {
+    mouseclick.x = mouse.x;
+    mouseclick.y = mouse.y;
+}
 var mMax = 10*20
+
 function planet(m,x,y,dx,dy,k1,k2,name,color,g,radius) {
     this.g = g; // universal gravitational constant 
     this.m = m; // in kg
@@ -35,18 +71,6 @@ function planet(m,x,y,dx,dy,k1,k2,name,color,g,radius) {
         c.fillStyle = this.color;
         c.fill();
     }
-    this.update = function() {
-        console.log('entrou')
-        if (mouse.x - this.x < 50 && mouse.x - this.x > -50 && mouse.y - this.y < 50 && mouse.y - this.y > -50) {
-            if (this.m < mMax) {
-                this.m += this.m;
-            }
-        }
-        else if(this.m >= this.mMin){
-            this.m -= 0.5*this.m;
-        }
-        this.draw();
-    } 
 }
 var forcagravitx = function(object1,object2) {
     if (object1.x == object2.x && object1.y == object2.y) {
@@ -74,15 +98,19 @@ function sistema(h,planetas) {
     this.merge = function() {
         for (var i = 0; i < this.planetas.length-1; i++) {
             for (var j = i+1; j < this.planetas.length;j++){
-                if (Math.abs(this.planetas[i].x-this.planetas[j].x) < 5 && Math.abs(this.planetas[i].y - 
-                this.planetas[j].y) < 5) {
-                    var removed = this.planetas.splice(j,1);
-                    this.planetas[i].x = removed.x;
-                    this.planetas[i].y = removed.y;
-                    this.planetas[i].dx = (this.planetas[i].m*this.planetas[i].dx +removed.m*removed.dx)/(removed.m+this.planetas[i].m);
-                    this.planetas[i].dy = (this.planetas[i].m*this.planetas[i].dy +removed.m*removed.dy)/(removed.m+this.planetas[i].m);
-                    this.planetas[i].m += removed.m;
-                    this.planetas[i].color = 'white';
+                if (Math.abs(this.planetas[i].x-this.planetas[j].x) < 10 && Math.abs(this.planetas[i].y - 
+                this.planetas[j].y) < 10) {
+                    this.planetas[i].m += this.planetas[j].m
+                    this.planetas.splice(j,1);
+                    //console.log(this.planetas.length);
+                    //this.planetas[i].x = removed.x;
+                    //this.planetas[i].y = removed.y;
+                    this.planetas[i].dx = 0;
+                    this.planetas[i].dy = 0;
+                    //this.planetas[i].dx = (this.planetas[i].m*this.planetas[i].dx +removed.m*removed.dx)/(removed.m+this.planetas[i].m);
+                    //this.planetas[i].dy = (this.planetas[i].m*this.planetas[i].dy +removed.m*removed.dy)/(removed.m+this.planetas[i].m);
+                    //this.planetas[i].m += removed.m;
+                    //this.planetas[i].color = 'white';
                 }
             }
         }
@@ -162,23 +190,44 @@ function sistema(h,planetas) {
             }
             novosvelx.push(this.planetas[k].dx + 0.5*(aceleracoesx[k]+acnewx)*this.h);
             novosvely.push(this.planetas[k].dy + 0.5*(aceleracoesy[k]+acnewy)*this.h);
-            console.log(mouse.x,mouse.y);
+            //console.log(mouseclick.x,mouseclick.y,counter);
         }
         for (var t = 0; t < this.planetas.length;t++) {
             this.planetas[t].x = novosposx[t];
             this.planetas[t].y = novosposy[t];
             this.planetas[t].dx = novosvelx[t];
             this.planetas[t].dy = novosvely[t];
-            if (Math.abs(mouse.x - this.planetas[t].x) < 50 && Math.abs(mouse.y - this.planetas[t].y) < 50) {
-                console.log('entrou')
-                this.planetas[t].m += 0.01*this.planetas[t].m;
-            }
+            //if (Math.abs(mouse.x - this.planetas[t].x) < 50 && Math.abs(mouse.y - this.planetas[t].y) < 50) {
+                //console.log('entrou')
+            //    this.planetas[t].m += 0.01*this.planetas[t].m;
+            if (mousenotPressed == false) {
+                if (Math.abs(mouseclick.x - this.planetas[t].x) < 20 && Math.abs(mouseclick.y - this.planetas[t].y) < 20) {
+                    //console.log('entrou');
+                    this.planetas[t].x = mouseclick.x;
+                    this.planetas[t].y = mouseclick.y;
+                }
+            //}    
+        }
             
         }
-        for (var i = 0; t < this.planetas.length; i++){
-            this.planetas[i].update();
-        }
-        //this.merge();
+//       for (var i = 0; i < this.planetas.length;i++) {
+//           if (this.planetas[i].x > innerWidth) {
+//               this.planetas[i].x -= innerWidth;
+//           }
+//            else if (this.planetas[i].x < 0) {
+//                this.planetas[i].x += innerWidth;
+//           }
+//       }
+
+//        for (var i = 0; i < this.planetas.length;i++) {
+//          if (this.planetas[i].y > innerHeight) {
+//              this.planetas[i].y -= innerHeight;
+//            }
+//            else if (this.planetas[i].y < 0){
+//                this.planetas[i].y += innerHeight;
+//            }
+//        }
+        this.merge();
         this.draw();
     }
 }
