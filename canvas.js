@@ -3,8 +3,27 @@ var canvas = document.querySelector('canvas')
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+
 var c = canvas.getContext('2d');
-var numberballs = window.prompt('quantas bolas vc quer?');
+var initcond = window.prompt('do you want to set up your own initial conditions? (yes or no)');
+if (initcond == 'yes'){
+    var numberballs = window.prompt('how many bodies do you want? (care)');
+    var listballsx = [];
+    var listballsy = [];
+    var listballsdx = [];
+    var listballsdy = [];
+    var listballscolors = [];
+
+    for (var i = 0; i < numberballs; i++) {
+        listballsx.push(window.prompt('tell me the initial x-position of ball number ' + String(i+1)));
+        listballsy.push(window.prompt('tell me the initial y-position of ball number '+ String(i+1)));
+        listballsdx.push(window.prompt('tell me the initial x-velocity of ball number ' + String(i+1)));
+        listballsdy.push(window.prompt('tell me the initial y-velocity of ball number ' + String(i+1) ));
+        listballscolors.push(window.prompt('tell me the color of ball number ' + String(i+1)));
+    }
+    var G = window.prompt('and lastly a gravitational constant (6.667e-11)');
+}
+
 var mousenotPressed = false;
 var counter = 0;
 var mouse = {
@@ -89,8 +108,8 @@ var forcagravity = function(object1,object2) {
         return (-object1.y+object2.y)*object1.g*object2.m/(Math.sqrt((object1.x -object2.x)*(object1.x-object2.x) + (object1.y - object2.y)*(object1.y - object2.y))**3);
     }
 }
-planetas = [new planet(10**15,400,300,1,-1,1,1,'Sun','yellow',6.667e-11,10),new planet(10**15,400,350,0,0,1,1,'Earth','blue',6.667e-11,10),
-            new planet(10**15, 440,330,-1,1,1,1,'Ball','green',6.667e-11,10)];
+//var planetas = [new planet(10**15,400,300,1,-1,1,1,'Sun','yellow',6.667e-11,10),new planet(10**15,400,350,0,0,1,1,'Earth','blue',6.667e-11,10),
+//            new planet(10**15, 440,330,-1,1,1,1,'Ball','green',6.667e-11,10)];
 var frames = 0;
 function sistema(h,planetas) {
     this.h = h;
@@ -231,8 +250,16 @@ function sistema(h,planetas) {
         this.draw();
     }
 }
-planetas = [new planet(10**15,500,500,-20,0,1,1,'Sun','yellow',6.667e-11,10), new planet(10**15, 300,300,20,0,1,1,'ball','blue',6.667e-11,10)
+if (initcond === 'yes'){
+    var planetas = [];
+    for (var i = 0; i < numberballs; i ++){
+        planetas.push(new planet(10**15,listballsx[i],listballsy[i],listballsdx[i],listballsdy[i],1,1,'ball',listballscolors[i],G,10))
+    }
+}
+if (initcond === 'no'){
+ var planetas = [new planet(10**15,500,500,-20,0,1,1,'Sun','yellow',6.667e-11,10), new planet(10**15, 300,300,20,0,1,1,'ball','blue',6.667e-11,10)
             ,new planet(10**15, 300,500,0,-20,1,1,'Ball','green',6.667e-11,10), new planet(10**15,500,300,0,20,1,1,'Ball','red',6.667e-11,10)];
+}
 system = new sistema(0.1,planetas);
 function animate() {
     requestAnimationFrame(animate);
