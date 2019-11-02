@@ -5,25 +5,70 @@ canvas.height = window.innerHeight;
 
 
 var c = canvas.getContext('2d');
-var initcond = window.prompt('do you want to set up your own initial conditions? (yes or no)');
-if (initcond == 'yes'){
-    var numberballs = window.prompt('how many bodies do you want? (care)');
-    var listballsx = [];
-    var listballsy = [];
-    var listballsdx = [];
-    var listballsdy = [];
-    var listballscolors = [];
-
-    for (var i = 0; i < numberballs; i++) {
-        listballsx.push(window.prompt('tell me the initial x-position of ball number ' + String(i+1)));
-        listballsy.push(window.prompt('tell me the initial y-position of ball number '+ String(i+1)));
-        listballsdx.push(window.prompt('tell me the initial x-velocity of ball number ' + String(i+1)));
-        listballsdy.push(window.prompt('tell me the initial y-velocity of ball number ' + String(i+1) ));
-        listballscolors.push(window.prompt('tell me the color of ball number ' + String(i+1)));
+alert('This is a simulation of the famous n-body problem, answer the prompts according to the instructions and then press some keys to see what happens!');
+var sistemasolar = window.prompt('do you want to simulate the solar system? (yes or no)');
+var ax = -3e11;
+var bx = 3e11;
+var ay = 3e11;
+var cy = -3e11;
+window.addEventListener('keydown',checkKeyPress,false);
+function checkKeyPress(key){
+    if (key.keyCode == '39'){
+        ax += 0.1*bx;
+        bx += 0.1*bx;
     }
-    var G = window.prompt('and lastly a gravitational constant (6.667e-11)');
+    else if(key.keyCode == '37'){
+        ax -= 0.1*bx;
+        bx -= 0.1*bx;
+    }
+    else if(key.keyCode == '40'){
+        cy += 0.1*cy;
+        ay += 0.1*cy;
+    }
+    else if(key.keyCode == '38'){
+        cy -= 0.1*cy;
+        ay -= 0.1*cy;
+    }
+    else if(key.keyCode == '81'){
+        ax += 0.1*ax;
+        bx += 0.1*bx;
+        cy += 0.1*cy;
+        ay += 0.1*ay;
+    }
+    else if(key.keyCode == '87'){
+        ax -= 0.1*ax;
+        bx -= 0.1*bx;
+        cy -= 0.1*cy;
+        ay -= 0.1*ay;
+    }
 }
 
+var H = window.prompt('how many hours do you want our step to be?');
+if (sistemasolar === 'yes'){
+    var moresuns = window.prompt("do you want to see more suns? (yes or no)")
+
+}
+if (sistemasolar === 'no') {
+    var initcond = window.prompt('do you want to set up your own initial conditions? (yes or no)');
+
+    if (initcond == 'yes'){
+        var numberballs = window.prompt('how many bodies do you want? (care)');
+        var listballsx = [];
+        var listballsy = [];
+        var listballsdx = [];
+        var listballsdy = [];
+        var listballscolors = [];
+
+        for (var i = 0; i < numberballs; i++) {
+            listballsx.push(window.prompt('tell me the initial x-position of ball number ' + String(i+1)));
+            listballsy.push(window.prompt('tell me the initial y-position of ball number '+ String(i+1)));
+            listballsdx.push(window.prompt('tell me the initial x-velocity of ball number ' + String(i+1)));
+            listballsdy.push(window.prompt('tell me the initial y-velocity of ball number ' + String(i+1) ));
+            listballscolors.push(window.prompt('tell me the color of ball number ' + String(i+1)));
+        }
+        var G = window.prompt('and lastly a gravitational constant (6.667e-11)');
+    }
+}
 var mousenotPressed = false;
 var counter = 0;
 var mouse = {
@@ -65,11 +110,8 @@ window.addEventListener('mouseup',function() {
     mousePressed = false;
     counter += 1;
 })
-if (counter%2 == 1) {
-    mouseclick.x = mouse.x;
-    mouseclick.y = mouse.y;
-}
 var mMax = 10*20
+
 
 function planet(m,x,y,dx,dy,k1,k2,name,color,g,radius) {
     this.g = g; // universal gravitational constant 
@@ -81,12 +123,14 @@ function planet(m,x,y,dx,dy,k1,k2,name,color,g,radius) {
     this.y = this.k1*y;
     this.dx = this.k2*dx;
     this.dy = this.k2*dy;
+    this.sx = innerWidth*(this.x-ax)/(bx-ax);
+    this.sy = innerHeight*(this.y-ay)/(cy-ay);
     this.radius = radius;
     this.name = name;
     this.color = color;
     this.draw = function() {
         c.beginPath();
-        c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
+        c.arc(this.sx,this.sy,this.radius,0,Math.PI*2,false);
         c.fillStyle = this.color;
         c.fill();
     }
@@ -108,8 +152,6 @@ var forcagravity = function(object1,object2) {
         return (-object1.y+object2.y)*object1.g*object2.m/(Math.sqrt((object1.x -object2.x)*(object1.x-object2.x) + (object1.y - object2.y)*(object1.y - object2.y))**3);
     }
 }
-//var planetas = [new planet(10**15,400,300,1,-1,1,1,'Sun','yellow',6.667e-11,10),new planet(10**15,400,350,0,0,1,1,'Earth','blue',6.667e-11,10),
-//            new planet(10**15, 440,330,-1,1,1,1,'Ball','green',6.667e-11,10)];
 var frames = 0;
 function sistema(h,planetas) {
     this.h = h;
@@ -136,11 +178,7 @@ function sistema(h,planetas) {
     }
     this.draw = function() {
         for (var i = 0; i < this.planetas.length; ++i) {
-            this.planetas[i].draw();
-            //c.beginPath();
-            //c.arc(this.planetas[i].x,this.planetas[i].y,this.planetas[i].radius,0,Math.PI*2,false);
-            //c.fillStyle = this.planetas[i].color;
-            //c.fill();
+            this.planetas[i].draw();  
         }
         var M = 0;
         var X = 0;
@@ -155,21 +193,26 @@ function sistema(h,planetas) {
         X *= 1/M;
         Y *= 1/M;
         c.beginPath();
-        c.arc(X,Y,R/(this.planetas.length**2),0,Math.PI*2,false);
+        c.arc(innerWidth*(X-ax)/(bx-ax),innerHeight*(Y-ay)/(cy-ay),R/(this.planetas.length**2),0,Math.PI*2,false);
         c.fillStyle = 'purple';
         c.fill();
-        for (var i = 0; i < this.planetas.length-1; i++){
-            for (var j = i; j < this.planetas.length; j++){
-                c.beginPath();
-                c.moveTo(this.planetas[i].x,this.planetas[i].y);
-                c.lineTo(this.planetas[j].x,this.planetas[j].y);
-                c.strokeStyle = 'purple';
-                c.stroke();
+        if (sistemasolar === 'yes') {
+            for (var i = 0; i < this.planetas.length-1; i++){
+                for (var j = i; j < this.planetas.length; j++){
+                    c.beginPath();
+                    c.moveTo(this.planetas[i].sx,this.planetas[i].sy);
+                    c.lineTo(this.planetas[j].sx,this.planetas[j].sy);
+                    c.strokeStyle = 'rgba(128,0,128,0.1)';
+                    c.stroke();
+                }
             }
         }
     }
     this.verlet = function() {
         frames += 1;
+        if (((h/3600)*frames)%24 == 0){
+            console.log(String(Math.floor((h/3600)*frames/24)) + ' days');
+        }
         var novosposx = [];
         var novosposy = [];
         var novosvelx = [];
@@ -216,17 +259,19 @@ function sistema(h,planetas) {
             this.planetas[t].y = novosposy[t];
             this.planetas[t].dx = novosvelx[t];
             this.planetas[t].dy = novosvely[t];
+            this.planetas[t].sx = innerWidth*(this.planetas[t].x-ax)/(bx-ax);
+            this.planetas[t].sy = innerHeight*(this.planetas[t].y -ay)/(cy-ay);
             //if (Math.abs(mouse.x - this.planetas[t].x) < 50 && Math.abs(mouse.y - this.planetas[t].y) < 50) {
                 //console.log('entrou')
             //    this.planetas[t].m += 0.01*this.planetas[t].m;
-            if (mousenotPressed == false) {
-                if (Math.abs(mouseclick.x - this.planetas[t].x) < 20 && Math.abs(mouseclick.y - this.planetas[t].y) < 20) {
+            //if (mousenotPressed == false) {
+                //if (Math.abs(mouseclick.x - this.planetas[t].sx) < 20 && Math.abs(mouseclick.y - this.planetas[t].y) < 20) {
                     //console.log('entrou');
-                    this.planetas[t].x = mouseclick.x;
-                    this.planetas[t].y = mouseclick.y;
-                }
+                    //this.planetas[t].sx = mouseclick.x;
+                    //this.planetas[t].sy = mouseclick.y;
+                //}
             //}    
-        }
+        //}
             
         }
 //       for (var i = 0; i < this.planetas.length;i++) {
@@ -250,17 +295,23 @@ function sistema(h,planetas) {
         this.draw();
     }
 }
-if (initcond === 'yes'){
-    var planetas = [];
-    for (var i = 0; i < numberballs; i ++){
-        planetas.push(new planet(10**15,listballsx[i],listballsy[i],listballsdx[i],listballsdy[i],1,1,'ball',listballscolors[i],G,10))
-    }
+if (sistemasolar === 'yes'){
+    var sol = new planet(1.9885*10**30,0,0,0,0,1,1,'Sun','yellow',6.67*10**-11,5);
+    var mercury = new planet(0.330*10**24,46*10**9,0,0,58.98*10**3,1,1,'Mercury','red',6.67*10**-11,5);
+    var venus = new planet(4.87*10**24,107.5*10**9,0,0,35.26*10**3,1,1,'Venus','green',6.67*10**-11,5);
+    var earth = new planet(5.97*10**24,147.1*10**9,0,0,30.29*10**3,1,1,'Earth','blue',6.67*10**-11,5);
+    var mars = new planet(0.642*10**24,206.6*10**9,0,0,26.5*10**3,1,1,'Mars','brown',6.67*10**-11,5);
+    var jupiter = new planet(1898*10**24,740.5*10**9,0,0,13.72*10**3,1,1,'Jupiter','lightblue',6.67*10**-11,5);
+    var saturn = new planet(568*10**24,1352.6*10**9,0,0,10.183*10**3,1,1,'Saturn','indigo',6.67*10**-11,5);
+    var uranus = new planet(86.8*10**24,2741.3*10**9,0,0,7.11*10**3,1,1,'Uranus','orange',6.67*10**-11,5);
+    var neptune = new planet(102*10**24,4444.5*10**9,0,0,5.5*10**3,1,1,'Neptune','cyan',6.67*10**-11,5);
+    var pluto = new planet(0.0146*10**24,4436.8*10**9,0,0,6.1*10**3,1,1,'Pluto','lightgreen',6.67*10**-11,5);
+    var planetas = [sol,mercury,venus,earth,mars,jupiter,saturn,uranus,neptune,pluto];
 }
-if (initcond === 'no'){
- var planetas = [new planet(10**15,500,500,-20,0,1,1,'Sun','yellow',6.667e-11,10), new planet(10**15, 300,300,20,0,1,1,'ball','blue',6.667e-11,10)
-            ,new planet(10**15, 300,500,0,-20,1,1,'Ball','green',6.667e-11,10), new planet(10**15,500,300,0,20,1,1,'Ball','red',6.667e-11,10)];
+else{    
+
 }
-system = new sistema(0.1,planetas);
+system = new sistema(3600*H,planetas);
 function animate() {
     requestAnimationFrame(animate);
     c.clearRect(0,0,innerWidth,innerHeight);
@@ -268,4 +319,18 @@ function animate() {
 }
 
 animate();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
