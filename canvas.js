@@ -6,12 +6,62 @@ canvas.height = window.innerHeight;
 
 var c = canvas.getContext('2d');
 alert('This is a simulation of the famous n-body problem, answer the prompts according to the instructions and then press some keys to see what happens!');
+var colorArray = [
+'#F27781',
+'#18298C',
+'#04BF8A',
+'#F2CF1D',
+'#F29F05',
+'#00A691',
+'#307EFE',
+'#D033BB',
+'#FF0089',
+'#1BBF15',
+'#F2360C',
+'#A60522',
+'#BF7E04',
+];
 var sistemasolar = window.prompt('do you want to simulate the solar system? (yes or no)');
+var H = window.prompt('how many hours do you want our step to be? (number)');
+if (sistemasolar === 'yes'){
+    var moresuns = window.prompt("do you want to see more suns? (yes or no)");
+    if (moresuns == 'yes'){
+        var howmany = window.prompt('how many? (number)');
+    }
+}
+if (sistemasolar === 'no') {
+    var numberballs = window.prompt('how many bodies do you want? (number)');
+    var initcond = window.prompt('do you want to set up your own initial conditions? (yes or no)');
+    if (initcond == 'yes'){
+        listballsmass = [];
+        var listballsx = [];
+        var listballsy = [];
+        var listballsdx = [];
+        var listballsdy = [];
+        var listballscolors = [];
+
+        for (var i = 0; i < numberballs; i++) {
+            listballsmass.push(window.prompt('tell me the mass of ball number ' + String(i+1) + " (earth's mass is 5.97e24)"))
+            listballsx.push(window.prompt('tell me the initial x-position of ball number ' + String(i+1)+ ' (number)'));
+            listballsy.push(window.prompt('tell me the initial y-position of ball number '+ String(i+1)+' (number)'));
+            listballsdx.push(window.prompt('tell me the initial x-velocity of ball number ' + String(i+1)+' (number)'));
+            listballsdy.push(window.prompt('tell me the initial y-velocity of ball number ' + String(i+1) + ' (number)' ));
+            listballscolors.push(window.prompt('tell me the color of ball number ' + String(i+1) + ' (can be in hexadecimal, rgba, or simply something like red'));
+        }
+        var G = window.prompt('and lastly a gravitational constant (number, 6.67e-11 is the usual one)');   
+    }
+    else{
+        alert('random numbers will generate ' + String(numberballs) + ' bodies for you :)'); 
+        var randombodies = [];
+    }
+}
+alert("Can you guess what's happening when you mouse over a body?");
 var ax = -3e11;
 var bx = 3e11;
 var ay = 3e11;
 var cy = -3e11;
 window.addEventListener('keydown',checkKeyPress,false);
+
 function checkKeyPress(key){
     if (key.keyCode == '39'){
         ax += 0.1*bx;
@@ -40,33 +90,6 @@ function checkKeyPress(key){
         bx -= 0.1*bx;
         cy -= 0.1*cy;
         ay -= 0.1*ay;
-    }
-}
-
-var H = window.prompt('how many hours do you want our step to be?');
-if (sistemasolar === 'yes'){
-    var moresuns = window.prompt("do you want to see more suns? (yes or no)")
-
-}
-if (sistemasolar === 'no') {
-    var initcond = window.prompt('do you want to set up your own initial conditions? (yes or no)');
-
-    if (initcond == 'yes'){
-        var numberballs = window.prompt('how many bodies do you want? (care)');
-        var listballsx = [];
-        var listballsy = [];
-        var listballsdx = [];
-        var listballsdy = [];
-        var listballscolors = [];
-
-        for (var i = 0; i < numberballs; i++) {
-            listballsx.push(window.prompt('tell me the initial x-position of ball number ' + String(i+1)));
-            listballsy.push(window.prompt('tell me the initial y-position of ball number '+ String(i+1)));
-            listballsdx.push(window.prompt('tell me the initial x-velocity of ball number ' + String(i+1)));
-            listballsdy.push(window.prompt('tell me the initial y-velocity of ball number ' + String(i+1) ));
-            listballscolors.push(window.prompt('tell me the color of ball number ' + String(i+1)));
-        }
-        var G = window.prompt('and lastly a gravitational constant (6.667e-11)');
     }
 }
 var mousenotPressed = false;
@@ -196,17 +219,19 @@ function sistema(h,planetas) {
         c.arc(innerWidth*(X-ax)/(bx-ax),innerHeight*(Y-ay)/(cy-ay),R/(this.planetas.length**2),0,Math.PI*2,false);
         c.fillStyle = 'purple';
         c.fill();
-        if (sistemasolar === 'yes') {
-            for (var i = 0; i < this.planetas.length-1; i++){
-                for (var j = i; j < this.planetas.length; j++){
-                    c.beginPath();
-                    c.moveTo(this.planetas[i].sx,this.planetas[i].sy);
-                    c.lineTo(this.planetas[j].sx,this.planetas[j].sy);
+        for (var i = 0; i < this.planetas.length-1; i++){
+            for (var j = i; j < this.planetas.length; j++){
+                c.beginPath();
+                c.moveTo(this.planetas[i].sx,this.planetas[i].sy);
+                c.lineTo(this.planetas[j].sx,this.planetas[j].sy);
+                if (sistemasolar == 'yes'){
                     c.strokeStyle = 'rgba(128,0,128,0.1)';
-                    c.stroke();
                 }
+                else{c.strokeStyle = 'rgba(128,0,128,0.5)'}
+                c.stroke();
             }
         }
+        
     }
     this.verlet = function() {
         frames += 1;
@@ -261,9 +286,12 @@ function sistema(h,planetas) {
             this.planetas[t].dy = novosvely[t];
             this.planetas[t].sx = innerWidth*(this.planetas[t].x-ax)/(bx-ax);
             this.planetas[t].sy = innerHeight*(this.planetas[t].y -ay)/(cy-ay);
-            //if (Math.abs(mouse.x - this.planetas[t].x) < 50 && Math.abs(mouse.y - this.planetas[t].y) < 50) {
-                //console.log('entrou')
-            //    this.planetas[t].m += 0.01*this.planetas[t].m;
+            if (Math.abs(mouse.x - this.planetas[t].sx) < 50 && Math.abs(mouse.y - this.planetas[t].sy) < 50) {
+                console.log('entrou')
+                this.planetas[t].m += 0.01*this.planetas[t].m;
+                console.log(this.planetas[t].sx);
+                console.log(this.planetas[t].x);
+            }
             //if (mousenotPressed == false) {
                 //if (Math.abs(mouseclick.x - this.planetas[t].sx) < 20 && Math.abs(mouseclick.y - this.planetas[t].y) < 20) {
                     //console.log('entrou');
@@ -300,22 +328,44 @@ if (sistemasolar === 'yes'){
     var mercury = new planet(0.330*10**24,46*10**9,0,0,58.98*10**3,1,1,'Mercury','red',6.67*10**-11,5);
     var venus = new planet(4.87*10**24,107.5*10**9,0,0,35.26*10**3,1,1,'Venus','green',6.67*10**-11,5);
     var earth = new planet(5.97*10**24,147.1*10**9,0,0,30.29*10**3,1,1,'Earth','blue',6.67*10**-11,5);
+    var moon = new planet(5.97*10**24 + 0.073*10**24,147.1*10**9 + 0.363*10**9,0,0,30.29*10**3 + 1.082*10**3,1,1,'Moon','white',6.67*10**-11,2);
     var mars = new planet(0.642*10**24,206.6*10**9,0,0,26.5*10**3,1,1,'Mars','brown',6.67*10**-11,5);
     var jupiter = new planet(1898*10**24,740.5*10**9,0,0,13.72*10**3,1,1,'Jupiter','lightblue',6.67*10**-11,5);
     var saturn = new planet(568*10**24,1352.6*10**9,0,0,10.183*10**3,1,1,'Saturn','indigo',6.67*10**-11,5);
     var uranus = new planet(86.8*10**24,2741.3*10**9,0,0,7.11*10**3,1,1,'Uranus','orange',6.67*10**-11,5);
     var neptune = new planet(102*10**24,4444.5*10**9,0,0,5.5*10**3,1,1,'Neptune','cyan',6.67*10**-11,5);
     var pluto = new planet(0.0146*10**24,4436.8*10**9,0,0,6.1*10**3,1,1,'Pluto','lightgreen',6.67*10**-11,5);
-    var planetas = [sol,mercury,venus,earth,mars,jupiter,saturn,uranus,neptune,pluto];
+    var planetas = [sol,mercury,venus,earth,moon,mars,jupiter,saturn,uranus,neptune,pluto];
+    if (moresuns == 'yes'){
+        console.log('entrou')
+        for (var i = 0; i < howmany; i ++){
+            planetas.push(new planet(1.9885e30,(Math.random()-0.5)*bx,(Math.random()-0.5)*ay,(Math.random()-0.5)*1000,(Math.random()-0.5)*1000,1,1,'Sun','yellow',6.67e-11,5));
+        }
+    }
 }
 else{    
 
 }
+if (sistemasolar === 'no' && initcond === 'no'){
+    var planetas = [];
+    for (var i =0; i < numberballs; i++){
+        planetas.push(new planet(1e27,(Math.random()-0.5)*bx,(Math.random()-0.5)*ay,(Math.random()-0.5)*10000,(Math.random()-0.5)*10000,1,1,'ball',colorArray[Math.floor(Math.random()*colorArray.length)],6.67e-11,5))
+    }
+}
+if (sistemasolar === 'no' && initcond === 'yes'){
+    var planetas = [];
+    for (var i = 0; i < numberballs; i++){
+        planetas.push(new planet(1e24,listballsx[i],listballsy[i],listballsdx[i],listballsdy[i],1,1,'just a ball', listballscolors[i],G,5));
+    
+    }
+}
+
 system = new sistema(3600*H,planetas);
 function animate() {
     requestAnimationFrame(animate);
     c.clearRect(0,0,innerWidth,innerHeight);
     system.verlet();
+    //console.log(system.planetas[0].sy);
 }
 
 animate();
