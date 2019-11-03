@@ -1,8 +1,6 @@
-var canvas = document.querySelector('canvas')
-    ;
+var canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
 
 var c = canvas.getContext('2d');
 alert('This is a simulation of the famous n-body problem, answer the prompts according to the instructions and then press some keys to see what happens!');
@@ -219,16 +217,18 @@ function sistema(h,planetas) {
         c.arc(innerWidth*(X-ax)/(bx-ax),innerHeight*(Y-ay)/(cy-ay),R/(this.planetas.length**2),0,Math.PI*2,false);
         c.fillStyle = 'purple';
         c.fill();
-        for (var i = 0; i < this.planetas.length-1; i++){
-            for (var j = i; j < this.planetas.length; j++){
-                c.beginPath();
-                c.moveTo(this.planetas[i].sx,this.planetas[i].sy);
-                c.lineTo(this.planetas[j].sx,this.planetas[j].sy);
-                if (sistemasolar == 'yes'){
-                    c.strokeStyle = 'rgba(128,0,128,0.1)';
+        if (this.planetas.length <= 5 ){
+            for (var i = 0; i < this.planetas.length-1; i++){
+                for (var j = i; j < this.planetas.length; j++){
+                    c.beginPath();
+                    c.moveTo(this.planetas[i].sx,this.planetas[i].sy);
+                    c.lineTo(this.planetas[j].sx,this.planetas[j].sy);
+                    if (sistemasolar == 'yes'){
+                        c.strokeStyle = 'rgba(128,0,128,0.1)';
+                    }
+                    else{c.strokeStyle = 'rgba(128,0,128,0.5)'}
+                    c.stroke();
                 }
-                else{c.strokeStyle = 'rgba(128,0,128,0.5)'}
-                c.stroke();
             }
         }
         
