@@ -53,7 +53,7 @@ if (sistemasolar === 'no') {
         var randombodies = [];
     }
 }
-alert("Can you guess what's happening when you mouse over a body?");
+alert("Increase a body's mass (by 1%) by hovering your mouse over it");
 var ax = -3e11;
 var bx = 3e11;
 var ay = 3e11;
