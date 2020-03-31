@@ -1,4 +1,4 @@
-# hollebenthiago.github.io
+# n-Body-Problem-2D
 Simulation n-body problem
 
 n-Body Problem Simulation in 2D 
