@@ -8,6 +8,5 @@ W/Q are for zooming in/out, you can also use the arrow keys.
 
 To dos:
  - HTML, CSS
- - Fix song
  - Fix the moon
  
