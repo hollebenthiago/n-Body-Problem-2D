@@ -2,7 +2,7 @@
 
 n-Body Problem Simulation in 2D 
 
-This was a project for a scientific computing class.
+This was a project for an undergraduate scientific computing class.
 
 W/Q are for zooming in/out, you can also use the arrow keys.
 
